@@ -1,9 +1,17 @@
 {
     "name": "ailuracode/wappify",
     "type": "library",
+    "description": "AiluraCode Wappify is a package that allows you to receive messages to WhatsApp using the WhatsApp Cloud API for Laravel.",
+    "keywords": [
+        "whatsapp",
+        "whatsapp cloud api",
+        "whatsapp api",
+        "Laravel"
+    ],
     "require": {
-        "illuminate/support": "^11.0",
-        "illuminate/database": "^11.0",
+        "php": "^7.4",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+        "illuminate/database": "^8.0|^9.0|^10.0|^11.0",
         "guzzlehttp/guzzle": "^7.8"
     },
     "autoload": {
@@ -15,6 +23,5 @@
         {
             "name": "AiluraCode"
         }
-    ],
-    "minimum-stability": "dev"
+    ]
 }
