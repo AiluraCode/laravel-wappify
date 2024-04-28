@@ -2,7 +2,7 @@
     "name": "ailuracode/wappify",
     "type": "library",
     "license": "MIT",
-    "version": "v1.0.2",
+    "version": "v1.0.3",
     "description": "Wappify is a package that allows you to receive messages to WhatsApp using the WhatsApp Cloud API for Laravel.",
     "keywords": [
         "whatsapp",
