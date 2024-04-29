@@ -11,8 +11,8 @@
     "require": {
         "php": "^7.3|^8.0",
         "laravel/framework": "^8.0",
-        "spatie/laravel-medialibrary": ">=8.0",
-        "guzzlehttp/guzzle": ">=7.8"
+        "spatie/laravel-medialibrary": "^8.0",
+        "guzzlehttp/guzzle": "^7.8"
     },
     "autoload": {
         "psr-4": {
