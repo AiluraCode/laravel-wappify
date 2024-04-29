@@ -2,28 +2,35 @@
 
 namespace AiluraCode\Wappify\Models;
 
+use AiluraCode\Wappify\Enums\MessageType;
+use AiluraCode\Wappify\Http\Clients\WhatsappMediaDownloader;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Class Whatsapp
  *
+ * @property int $id
  * @property string $wa_id
  * @property string $from
- * @property string $type
+ * @property MessageType $type
+ * @property mixed $message
  * @property int $timestamp
- * @property WhatsappMessages $message
- * @property WhatsappMedia $media
- * @property WhatsappMediaDocument $document
- * @property WhatsappMediaSticker $sticker
- * @property WhatsappMediaImage $image
- * @property WhatsappMediaLocation $location
- * @property WhatsappMediaAudio $audio
- * @property WhatsappMediaVideo $video
+ * @property string $message["id"]
+ * @property string $message["mime_type"]
+ * @property string $message["sha256"]
+ * @property string $message["filename"]
+ * @property string $message["body"]
+ * @property string $message["latitude"]
+ * @property string $message["longitude"]
+ * @property string $message["animated"]
+ * @property string $message["voice"]
  * @package AiluraCode\Wappify\Models
  */
-class Whatsapp extends Model
+class Whatsapp extends Model implements HasMedia
 {
+    use InteractsWithMedia;
 
     protected $table = 'whatsapp';
     public $timestamps = false;
@@ -32,67 +39,41 @@ class Whatsapp extends Model
         'wa_id',
         'from',
         'type',
+        'message',
         'timestamp',
+        'message->filename',
     ];
 
-    public function message(): HasOne
+    protected $casts = [
+        'message' => 'array',
+        'type' => MessageType::class,
+    ];
+
+    public function streamAsync()
     {
-        if ($this->type != 'text') {
-            throw new \Exception("This is not a $this->type");
-        }
-        return $this->hasOne(WhatsappMessages::class, 'whatsapp_id');
+        return WhatsappMediaDownloader::getContentAsync($this);
     }
 
-    public function media(): HasOne
+    public function stream()
     {
-        return $this->hasOne(WhatsappMedia::class, 'whatsapp_id');
+        return $this->streamAsync()->wait();
     }
 
-    public function document(): HasOne
+
+    public function downloadAsync()
     {
-        if ($this->type != 'document') {
-            throw new \Exception("This is not a $this->type");
-        }
-        return $this->hasOne(WhatsappMediaDocument::class, 'whatsapp_id');
+        return WhatsappMediaDownloader::downloadAsync($this);
     }
 
-    public function sticker(): HasOne
+    public function download()
     {
-        if ($this->type != 'sticker') {
-            throw new \Exception("This is not a $this->type");
-        }
-        return $this->hasOne(WhatsappMediaSticker::class, 'whatsapp_id');
+        return $this->downloadAsync()->wait();
     }
 
-    public function image(): HasOne
+    public function getFilename(): string
     {
-        if ($this->type != 'image') {
-            throw new \Exception("This is not a $this->type");
-        }
-        return $this->hasOne(WhatsappMediaImage::class, 'whatsapp_id');
-    }
-
-    public function location(): HasOne
-    {
-        if ($this->type != 'location') {
-            throw new \Exception("This is not a $this->type");
-        }
-        return $this->hasOne(WhatsappMediaLocation::class, 'whatsapp_id');
-    }
-
-    public function audio(): HasOne
-    {
-        if ($this->type != 'audio') {
-            throw new \Exception("This is not a $this->type");
-        }
-        return $this->hasOne(WhatsappMediaAudio::class, 'whatsapp_id');
-    }
-
-    public function video(): HasOne
-    {
-        if ($this->type != 'video') {
-            throw new \Exception("This is not a $this->type");
-        }
-        return $this->hasOne(WhatsappMediaVideo::class, 'whatsapp_id');
+        if ($this->type->isDownloadable())
+            return str_replace("wamid", "", $this->wa_id) . '.' . explode('/', $this->message['mime_type'])[1];
+        else return '';
     }
 }
