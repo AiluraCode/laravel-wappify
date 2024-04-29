@@ -9,8 +9,8 @@
         "laravel"
     ],
     "require": {
-        "php": ">=7.4",
-        "aravel/framework": ">=8.0",
+        "php": "^7.3|^8.0",
+        "laravel/framework": "^8.0",
         "spatie/laravel-medialibrary": ">=8.0",
         "guzzlehttp/guzzle": ">=7.8"
     },
