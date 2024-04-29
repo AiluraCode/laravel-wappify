@@ -19,23 +19,32 @@ final class WhatsappReceiveJob implements ShouldQueue
     use SerializesModels;
 
     private Wappify $wappify;
+    private string|false $payload;
+    private bool $save;
 
-    public function __construct()
+    public function __construct(string|false $payload, bool $save = false)
     {
-        $payload = file_get_contents('php://input');
-        $this->wappify = new Wappify();
-        $this->wappify->catch($payload);
-        try {
-            if (!$this->wappify->whatsapp) {
-                http_response_code(404);
-            }
-        } catch (\Throwable $th) {
-            http_response_code(409);
-        }
+        $this->payload = $payload;
+        $this->save = $save;
     }
 
     public function handle(): void
     {
-        exit;
+        $this->wappify = new Wappify();
+        $this->wappify->catch($this->payload);
+        try {
+            if (!$this->wappify->whatsapp) {
+                return;
+            }
+            if ($this->save) {
+                $this->wappify->whatsapp->save();
+                if (!$this->wappify->whatsapp->type->isDownloadable())
+                    return;
+                WhatsappGetURLMedia::dispatch($this->wappify->whatsapp)
+                    ->onQueue(config('wappify.queue_url'));
+            }
+        } catch (\Throwable $th) {
+            $this->fail($th);
+        }
     }
 }
