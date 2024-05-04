@@ -17,26 +17,8 @@ return new class extends Migration
                 ->unique();
             $table->string('from', 20);
             $table->string('type', 20);
+            $table->json('message');
             $table->bigInteger('timestamp');
-        });
-
-        Schema::create('whatsapp_messages', function (Blueprint $table) {
-            $table->foreignId('whatsapp_id')
-                ->primary()
-                ->constrained('whatsapp')
-                ->cascadeOnDelete();
-            $table->string('text');
-        });
-
-        Schema::create('whatsapp_media', function (Blueprint $table) {
-            $table->foreignId('whatsapp_id')
-                ->primary()
-                ->constrained('whatsapp')
-                ->cascadeOnDelete();
-            $table->string('id')->nullable();
-            $table->string('mime_type', 20)->nullable();
-            $table->string('sha256')->nullable();
-            $table->json('data');
         });
     }
 
@@ -46,7 +28,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('whatsapp');
-        Schema::dropIfExists('whatsapp_messages');
-        Schema::dropIfExists('whatsapp_media');
     }
 };

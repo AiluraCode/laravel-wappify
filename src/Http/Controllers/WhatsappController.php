@@ -2,26 +2,28 @@
 
 namespace AiluraCode\Wappify\Http\Controllers;
 
-use AiluraCode\Wappify\Http\Clients\WhatsappMediaDownloader;
+use AiluraCode\Wappify\Http\Clients\WhatsappClientDownloader;
 use AiluraCode\Wappify\Jobs\WhatsappReceiveJob;
 use AiluraCode\Wappify\Models\Whatsapp;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
+use Netflie\WhatsAppCloudApi\WebHook;
 
 final class WhatsappController extends Controller
 {
     public function webhook(): void
     {
-        //echo webhook();
+        $webhook = new WebHook();
+        echo $webhook->verify($_GET, env('WHATSAPP_API_TOKEN_VERIFICATION'));
     }
 
     public function receive()
     {
         $payload = file_get_contents('php://input');
         WhatsappReceiveJob::dispatch($payload, config('wappify.save'))
-            ->onQueue(config('wappify.queue_messages'));
-        exit();
+            ->onQueue(config('wappify.queue'));
+        return response()->json(['message' => 'Message received']);;
     }
 
     public function index()
@@ -29,32 +31,41 @@ final class WhatsappController extends Controller
         return Whatsapp::all();
     }
 
-    public function history(string $from)
+    public function show(string $id)
     {
-        return Whatsapp::where('from', $from)->get();
+        $whatsapp = Whatsapp::with('media')->find($id);
+        if (!$whatsapp) {
+            return Response::json(['message' => 'Whatsapp not found'], 404);
+        }
+        return Whatsapp::with('media')->find($id);
     }
 
-    public function media(string $id)
+    public function destroy(string $id, Request $request)
     {
-        return Whatsapp::where('wa_id', $id)->get();
-    }
-
-    public function stream(string $id)
-    {
+        $withMedia = boolval($request->get('withMedia')) ?? false;
         $whatsapp = Whatsapp::find($id);
-        $file = $whatsapp->stream();
-        $headers = [
-            "Content-Type" => $whatsapp->message['mime_type'],
-            "Content-Disposition" => "inline; filename=" . uniqid()
-        ];
-        return Response::download($file, uniqid(), $headers);
+        if (!$whatsapp) {
+            return Response::json(['message' => 'Whatsapp not found'], 404);
+        }
+        $whatsapp->delete();
+        if ($withMedia) {
+            $whatsapp->media->each(fn ($media) => $media->delete());
+            return Response::json(['message' => 'Whatsapp deleted with media']);
+        }
+        return Response::json(['message' => 'Whatsapp deleted']);
     }
 
     public function download(string $id)
     {
         $whatsapp = Whatsapp::find($id);
-        $whatsapp->addMediaFromStream($whatsapp->stream())
-            ->usingFileName($whatsapp->getFilename())
-            ->toMediaCollection();
+        if (!$whatsapp) {
+            return Response::json(['message' => 'Whatsapp not found'], 404);
+        }
+        try {
+            WhatsappClientDownloader::download($whatsapp);
+            return Response::json(['message' => 'Media downloaded']);
+        } catch (\Throwable $th) {
+            return Response::json(['message' => 'Error downloading media'], 500);
+        }
     }
 }

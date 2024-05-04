@@ -8,11 +8,34 @@ Route::controller(WhatsappController::class)
     ->prefix('whatsapp')
     ->group(
         function (): void {
-            Route::post('/webhook', 'receive')->name('receive');
-            Route::get('/', 'index')->name('index');
-            Route::get('/history/{from}', 'history')->name('history');
-            Route::get('/media/{id}', 'media')->name('media');
-            Route::get('/media/{id}/download', 'download')->name('download');
-            Route::get('/media/{id}/stream', 'stream')->name('stream');
+            Route::group(
+                ['prefix' => 'webhook'],
+                function (): void {
+                    Route::get('/', 'webhook')->name('webhook');
+                    Route::post('/', 'receive')->name('receive');
+                }
+            );
+            Route::prefix('messages')
+                ->group(
+                    function (): void {
+                        Route::get('/', 'index')->name('messages.index');
+                        Route::get('{id}', 'show')->name('messages.show');
+                        Route::delete('{id}', 'destroy')->name('messages.destroy');
+                        Route::group(
+                            ['prefix' => '{id}/media'],
+                            function (): void {
+                                Route::get('/', 'index')->name('messages.media.index');
+                                Route::delete('/', 'destroy')->name('messages.media.destroy');
+                            }
+                        );
+                    }
+                );
+            Route::prefix('media')
+                ->group(
+                    function (): void {
+                        Route::get('/', 'index')->name('media.index');
+                        Route::delete('{id}', 'destroy')->name('messages.destroy');
+                    }
+                );
         }
     );

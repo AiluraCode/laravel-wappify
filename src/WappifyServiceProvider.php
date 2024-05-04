@@ -32,5 +32,10 @@ class WappifyServiceProvider extends ServiceProvider
                 __DIR__ . '/../database/migrations/_create_wappify_tables.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_wappify_tables.php'),
             ], 'migrations');
         }
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Console\Commands\WappifyRunQueue::class,
+            ]);
+        }
     }
 }

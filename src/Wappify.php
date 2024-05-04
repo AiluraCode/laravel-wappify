@@ -3,54 +3,66 @@
 namespace AiluraCode\Wappify;
 
 use AiluraCode\Wappify\Models\Whatsapp;
-use AiluraCode\Wappify\Models\WhatsappMedia;
-use AiluraCode\Wappify\Models\WhatsappMessages;
 
 /**
  * Class Wappify
  *
- * @property Whatsapp $whatsapp
- * @property WhatsappMessages $message
- * @property WhatsappMedia $media
  * @package AiluraCode\Wappify
  */
 class Wappify
 {
-    public $whatsapp = null;
 
-    public function catch(mixed $payload): Wappify
+    /**
+     * Wappify constructor.
+     *
+     * @param Whatsapp $whatsapp
+     */
+    public function __construct(
+        private Whatsapp $whatsapp
+    ) {
+    }
+
+    /**
+     * @param mixed $payload
+     * @return Wappify
+     */
+    public static function catch(mixed $payload): Wappify
     {
         $model = self::payloadToModel($payload);
-        $this->whatsapp = new Whatsapp();
-        $this->whatsapp->wa_id = $model['id'];
-        $this->whatsapp->from = $model['from'];
-        $this->whatsapp->type = $model['type'];
-        $this->whatsapp->message = $model['message'];
-        $this->whatsapp->timestamp = $model['timestamp'];
-        return $this;
+        $whatsapp = new Whatsapp();
+        $whatsapp->wa_id = $model['id'];
+        $whatsapp->from = $model['from'];
+        $whatsapp->type = $model['type'];
+        $whatsapp->message = $model['message'];
+        $whatsapp->timestamp = $model['timestamp'];
+        $instance = new self($whatsapp);
+        return $instance;
     }
 
-    public function save(): Wappify
+    /**
+     * @return Whatsapp
+     */
+    public function get()
     {
-        $this->whatsapp->save();
-        if ($this->whatsapp->type == 'text') {
-            $this->message->save();
-        } else {
-            $this->media->save();
-        }
-        return $this;
+        return $this->whatsapp;
     }
 
-    public static function payloadToModel(mixed $payload)
+    /**
+     *  Convert payload to
+     *
+     * @param mixed $payload
+     * @return array
+     */
+    public static function payloadToModel(mixed $payload): array
     {
         $json = json_decode($payload, true);
-
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \InvalidArgumentException('Invalid payload');
+        }
         $message = $json['entry'][0]['changes'][0]['value']['messages'][0] ?? null;
-
         if (!$message) {
             throw new \Exception('Invalid payload');
         }
-
         $data = [
             "id" => $message['id'],
             "from" => $message['from'],
@@ -58,7 +70,6 @@ class Wappify
             "message" => $message[$message['type']],
             "timestamp" => $message['timestamp'],
         ];
-
         return $data;
     }
 }

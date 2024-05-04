@@ -8,12 +8,20 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Storage;
 
-class WhatsappMediaDownloader
+class WhatsappClientDownloader
 {
     private static function buildUrl(string $id): string
     {
-        $version = config('wappify.version');
-        return "https://graph.facebook.com/{$version}/{$id}/";
+        $url = config('wappify.api.url');
+        $version = config('wappify.api.version');
+        return "$url/{$version}/{$id}/";
+    }
+
+    public static function buildHeaders(): array
+    {
+        return [
+            'Authorization' => "Bearer " . env('WHATSAPP_API_TOKEN')
+        ];
     }
 
     public static function getUrlAsync(Whatsapp $whatsapp): PromiseInterface
@@ -23,8 +31,7 @@ class WhatsappMediaDownloader
         }
         $url = self::buildUrl($whatsapp->message["id"]);
         $client = new Client();
-        $request = new Request('GET', $url,
-    );
+        $request = new Request('GET', $url, self::buildHeaders());
         return $client
             ->sendAsync($request)
             ->then(
@@ -47,7 +54,7 @@ class WhatsappMediaDownloader
     public static function getContentAsync(Whatsapp $whatsapp): PromiseInterface
     {
         $client = new Client();
-        $request = new Request('GET', self::getUrl($whatsapp), config('wappify.headers'));
+        $request = new Request('GET', self::getUrl($whatsapp), self::buildHeaders());
         return $client->sendAsync($request)
             ->then(fn ($response) => $response->getBody());
     }
@@ -62,11 +69,13 @@ class WhatsappMediaDownloader
         return self::getContentAsync($whatsapp)->then(
             function ($stream) use ($whatsapp, $name, $path): string {
                 $name = $name ?? str_replace("wamid.", "", $whatsapp->wa_id);
-                $path = $path ?? config('wappify.download_path');
-                $ext = self::getExtension($whatsapp->message['mime_type']);
-                $path = "{$path}/{$ext}/{$name}.{$ext}";
-                Storage::put($path, $stream->getContents());
-                return $path;
+                $downloadStrategy = config('wappify.download.strategy');
+                if ($downloadStrategy === 'default') {
+                    return self::defaultDownloadStrrategy($whatsapp, $name, $stream, $path);
+                }
+                if ($downloadStrategy === 'spatie') {
+                    return self::spatieDownloadStrategy($whatsapp, $name, $stream);
+                }
             }
         );
     }
@@ -79,5 +88,21 @@ class WhatsappMediaDownloader
     private static function getExtension(string $mime_type): string
     {
         return explode('/', $mime_type)[1];
+    }
+
+    private static function defaultDownloadStrrategy(Whatsapp $whatsapp, string $name, mixed $stream, string $path = null): string
+    {
+        $path = $path ?? config('wappify.default.path');
+        $ext = self::getExtension($whatsapp->message['mime_type']);
+        $path = "{$path}/{$ext}/{$name}.{$ext}";
+        Storage::put($path, $stream->getContents());
+        return $path;
+    }
+
+    private static function spatieDownloadStrategy(Whatsapp $whatsapp, string $name, mixed $stream): string
+    {
+        return $whatsapp->addMediaFromStream($stream)
+            ->usingFileName($name)
+            ->toMediaCollection();
     }
 }

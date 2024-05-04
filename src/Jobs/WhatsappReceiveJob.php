@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiluraCode\Wappify\Jobs;
 
+use AiluraCode\Wappify\Models\Whatsapp;
 use AiluraCode\Wappify\Wappify;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,7 +19,7 @@ final class WhatsappReceiveJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    private Wappify $wappify;
+    private Whatsapp $whatsapp;
     private string|false $payload;
     private bool $save;
 
@@ -30,21 +31,17 @@ final class WhatsappReceiveJob implements ShouldQueue
 
     public function handle(): void
     {
-        $this->wappify = new Wappify();
-        $this->wappify->catch($this->payload);
-        try {
-            if (!$this->wappify->whatsapp) {
-                return;
-            }
-            if ($this->save) {
-                $this->wappify->whatsapp->save();
-                if (!$this->wappify->whatsapp->type->isDownloadable())
-                    return;
-                WhatsappGetURLMedia::dispatch($this->wappify->whatsapp)
-                    ->onQueue(config('wappify.queue_url'));
-            }
-        } catch (\Throwable $th) {
-            $this->fail($th);
+        $this->whatsapp = Wappify::catch($this->payload)->get();
+        $whatsapp = $this->whatsapp;
+        if (!$whatsapp) {
+            return;
+        }
+        if (Whatsapp::where('wa_id', $whatsapp->wa_id)->exists()) {
+            $this->fail('Whatsapp already exists');
+        }
+        if (config('wappify.download.automatic')) {
+            $whatsapp->save();
+            $whatsapp->download();
         }
     }
 }

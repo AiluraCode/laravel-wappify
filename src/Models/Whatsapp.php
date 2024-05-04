@@ -3,7 +3,7 @@
 namespace AiluraCode\Wappify\Models;
 
 use AiluraCode\Wappify\Enums\MessageType;
-use AiluraCode\Wappify\Http\Clients\WhatsappMediaDownloader;
+use AiluraCode\Wappify\Http\Clients\WhatsappClientDownloader;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -41,7 +41,6 @@ class Whatsapp extends Model implements HasMedia
         'type',
         'message',
         'timestamp',
-        'message->filename',
     ];
 
     protected $casts = [
@@ -49,31 +48,21 @@ class Whatsapp extends Model implements HasMedia
         'type' => MessageType::class,
     ];
 
-    public function streamAsync()
-    {
-        return WhatsappMediaDownloader::getContentAsync($this);
-    }
-
-    public function stream()
-    {
-        return $this->streamAsync()->wait();
-    }
-
-
-    public function downloadAsync()
-    {
-        return WhatsappMediaDownloader::downloadAsync($this);
-    }
-
     public function download()
     {
-        return $this->downloadAsync()->wait();
+        return WhatsappClientDownloader::download($this);
     }
 
-    public function getFilename(): string
+    public function setFilename(): string
     {
         if ($this->type->isDownloadable())
-            return str_replace("wamid", "", $this->wa_id) . '.' . explode('/', $this->message['mime_type'])[1];
+            return str_replace("wamid.", "", $this->wa_id) . '.' . explode('/', $this->message['mime_type'])[1];
         else return '';
+    }
+
+    public function deleteWithMedia()
+    {
+        $this->media->each->delete();
+        $this->delete();
     }
 }

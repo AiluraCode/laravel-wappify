@@ -13,15 +13,10 @@ enum MessageType: string
     case CONTACT = 'contact';
     case STICKER = 'sticker';
     case INTERACTIVE = 'interactive';
+    case CONTACTS = 'contacts';
 
     public function isDownloadable(): bool
     {
-        return in_array($this, [
-            self::IMAGE,
-            self::AUDIO,
-            self::DOCUMENT,
-            self::VIDEO,
-            self::STICKER,
-        ]);
+        return in_array($this, config('wappify.download.allowed'));
     }
 }
