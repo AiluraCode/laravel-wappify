@@ -3,20 +3,55 @@
 use AiluraCode\Wappify\Enums\MessageType as Whatsapp;
 
 return [
-    'api' => [
+
+    'client' => [
         'url' => 'https://graph.facebook.com',
         'version' => 'v19.0',
         'token' => env('WHATSAPP_API_TOKEN'),
     ],
 
-    'queue' => 'whatsapp',
-    'tries' => 1,
-    'timeout' => 60,
-    'name' => 'wappify',
+    'api' => [
+        'name' => 'whatsapp',
+        'prefix' => 'whatsapp',
+    ],
+
+    'queue' => [
+        'name' => 'whatsapp',
+        'tries' => 1,
+        'timeout' => 60,
+        'name' => 'wappify',
+    ],
+
+    'profile' => 'wappify',
+
+    'middlewares' => [
+        'webhook' => [
+            'facebook'
+        ],
+        'messages' => [
+            'auth'
+        ],
+        'chat' => [],
+    ],
+
+    'middleware' => [
+        'facebook' => [
+            'name' => 'facebook',
+            'headers' => [
+                'User-Agent' => ['facebookplatform/1.0 (+http://developers.facebook.com)', 'facebookexternalua'],
+
+            ],
+            'unauthorized-request' => 'Request rejected because the client does not belong to Facebook',
+        ],
+        'auth' => [
+            'name' => 'auth',
+            'unauthorized-request' => 'Request rejected because the user is not authorized',
+        ],
+    ],
 
     'download' => [
         'automatic' => true,
-        'strategy' => 'default',
+        'strategy' => 'spatie',
         'allowed' => [
             Whatsapp::IMAGE,
             Whatsapp::AUDIO,
@@ -34,5 +69,6 @@ return [
     'spatie' => [
         'disk' => 'public',
         'properties' => [],
+        'collection' => 'whatsapp',
     ]
 ];

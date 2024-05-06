@@ -3,6 +3,7 @@
 namespace AiluraCode\Wappify;
 
 use AiluraCode\Wappify\Models\Whatsapp;
+use Netflie\WhatsAppCloudApi\Response;
 
 /**
  * Class Wappify
@@ -29,8 +30,48 @@ class Wappify
     public static function catch(mixed $payload): Wappify
     {
         $model = self::payloadToModel($payload);
+        return self::createFromModel($model);
+    }
+
+    /**
+     * @param Response $response
+     * @return Wappify
+     */
+    public static function raise(Response $response): Wappify
+    {
+        $model = self::responseToModel($response);
+        return self::createFromModel($model);
+    }
+
+    /**
+     * @param Response $response
+     * @return array
+     */
+    public static function responseToModel(Response $response): array
+    {
+        $whatsappRequest = $response->request()->body();
+        $whatsappBody = $response->decodedBody();
+        $data = [
+            "id" => $whatsappBody['messages'][0]['id'],
+            "profile" => config('wappify.profile'),
+            "from" => $whatsappBody['contacts'][0]['wa_id'],
+            "type" => $whatsappRequest['type'],
+            "message" => $whatsappRequest[$whatsappRequest['type']],
+            "timestamp" => time(),
+        ];
+        return $data;
+    }
+
+    /**
+     * @param array $model
+     * @return Wappify
+     */
+    public static function createFromModel(array $model): Wappify
+    {
         $whatsapp = new Whatsapp();
-        $whatsapp->wa_id = $model['id'];
+
+        $whatsapp->id = $model['id'];
+        $whatsapp->profile = $model['profile'];
         $whatsapp->from = $model['from'];
         $whatsapp->type = $model['type'];
         $whatsapp->message = $model['message'];
@@ -60,16 +101,29 @@ class Wappify
             throw new \InvalidArgumentException('Invalid payload');
         }
         $message = $json['entry'][0]['changes'][0]['value']['messages'][0] ?? null;
-        if (!$message) {
+        $status = $json['entry'][0]['changes'][0]['value']['statuses'][0] ?? null;
+        if (!$message && !$status) {
             throw new \Exception('Invalid payload');
         }
-        $data = [
-            "id" => $message['id'],
-            "from" => $message['from'],
-            "type" => $message['type'],
-            "message" => $message[$message['type']],
-            "timestamp" => $message['timestamp'],
-        ];
+        if ($message) {
+            $data = [
+                "id" => $message['id'],
+                "profile" => $json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name'],
+                "from" => $message['from'],
+                "type" => $message['type'],
+                "message" => $message[$message['type']],
+                "timestamp" => $message['timestamp'],
+            ];
+        } else {
+            $data = [
+                'id' => $status['id'],
+                'profile' => $json['entry'][0]['changes'][0]['value']['metadata']['display_phone_number'],
+                'from' => $status['recipient_id'],
+                "type" => 'status',
+                'message' => ["status" => $status['status']],
+                'timestamp' => $status['timestamp'],
+            ];
+        }
         return $data;
     }
 }

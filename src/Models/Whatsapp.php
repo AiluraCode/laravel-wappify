@@ -3,7 +3,9 @@
 namespace AiluraCode\Wappify\Models;
 
 use AiluraCode\Wappify\Enums\MessageType;
-use AiluraCode\Wappify\Http\Clients\WhatsappClientDownloader;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -34,9 +36,13 @@ class Whatsapp extends Model implements HasMedia
 
     protected $table = 'whatsapp';
     public $timestamps = false;
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'wa_id',
+        'id',
+        'profile',
         'from',
         'type',
         'message',
@@ -44,25 +50,49 @@ class Whatsapp extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'message' => 'array',
+        'message' => 'object',
         'type' => MessageType::class,
+        'timestamp' => 'datetime',
     ];
-
-    public function download()
-    {
-        return WhatsappClientDownloader::download($this);
-    }
-
-    public function setFilename(): string
-    {
-        if ($this->type->isDownloadable())
-            return str_replace("wamid.", "", $this->wa_id) . '.' . explode('/', $this->message['mime_type'])[1];
-        else return '';
-    }
 
     public function deleteWithMedia()
     {
         $this->media->each->delete();
         $this->delete();
+    }
+
+    public static function findByFrom(string $from): Builder
+    {
+        return self::whereFrom($from);
+    }
+
+    public static function findByWaId(string $waId): Collection
+    {
+        return self::whereWaId($waId)->get();
+    }
+
+    public function scopeLastMessage($query): Whatsapp
+    {
+        return $query->orderBy('timestamp', 'desc')->first();
+    }
+
+    public function scopeLastTextMessage($query): Whatsapp
+    {
+        return $query->whereType("text")->orderBy('timestamp', 'desc')->first();
+    }
+
+    public function scopeChat($query, string $from): Builder
+    {
+        return $query->whereFrom($from)->orderBy('timestamp', 'desc');
+    }
+
+    public function scopeMe(): Builder
+    {
+        return self::where('id', 'LIKE', '%==');
+    }
+
+    public function scopeYou(): Builder
+    {
+        return self::where('id', 'NOT LIKE', '%==');
     }
 }

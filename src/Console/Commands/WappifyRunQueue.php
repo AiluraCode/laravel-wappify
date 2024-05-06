@@ -19,19 +19,20 @@ class WappifyRunQueue extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Run the queue for whatsapp messages.';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('Running queue');
-        Artisan::queue('queue:work', [
-            '--queue' => config('wappify.queue'),
-            '--tries' => config('wappify.tries'),
-            '--timeout' => config('wappify.timeout'),
-            '--name' => config('wappify.name'),
+        $this->info('Run command: php artisan queue:listen --queue=whatsapp --tries=1 --timeout=60 --name=wappify');
+        $this->line('Running queue');
+        Artisan::call('queue:listen', [
+            '--queue' => config('wappify.queue.name'),
+            '--tries' => config('wappify.queue.tries'),
+            '--timeout' => config('wappify.queue.timeout'),
+            '--name' => config('wappify.queue.name'),
         ]);
     }
 }

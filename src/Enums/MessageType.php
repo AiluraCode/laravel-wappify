@@ -14,6 +14,7 @@ enum MessageType: string
     case STICKER = 'sticker';
     case INTERACTIVE = 'interactive';
     case CONTACTS = 'contacts';
+    case STATUS = 'status';
 
     public function isDownloadable(): bool
     {

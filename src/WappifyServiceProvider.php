@@ -37,5 +37,7 @@ class WappifyServiceProvider extends ServiceProvider
                 Console\Commands\WappifyRunQueue::class,
             ]);
         }
+        $this->app['router']->aliasMiddleware(config('wappify.middleware.facebook.name'), \AiluraCode\Wappify\Http\Middleware\FacebookMiddleware::class);
+        $this->app['router']->aliasMiddleware(config('wappify.middleware.auth.name'), \AiluraCode\Wappify\Http\Middleware\AuthMiddleware::class);
     }
 }
