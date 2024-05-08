@@ -65,7 +65,7 @@ class WhatsappClientDownloader
     {
         return self::getContentAsync($whatsapp)->then(
             function ($stream) use ($whatsapp, $name, $path): string {
-                $name = $name ?? str_replace("wamid.", "", $whatsapp->id);
+                $name = $name ?? str_replace("wamid.", "", $whatsapp->wamid);
                 $downloadStrategy = config('wappify.download.strategy');
                 if ($downloadStrategy === 'default') {
                     return self::defaultDownloadStrrategy($whatsapp, $name, $stream, $path);

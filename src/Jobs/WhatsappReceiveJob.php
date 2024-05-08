@@ -36,7 +36,7 @@ final class WhatsappReceiveJob implements ShouldQueue
         if (!$whatsapp) {
             return;
         }
-        if (Whatsapp::where('wa_id', $whatsapp->wa_id)->exists()) {
+        if (Whatsapp::where('wamid', $whatsapp->wamid)->exists()) {
             $this->fail('Whatsapp already exists');
         }
         if (config('wappify.download.automatic')) {

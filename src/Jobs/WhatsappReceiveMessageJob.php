@@ -34,14 +34,16 @@ final class WhatsappReceiveMessageJob implements ShouldQueue
             if (!$whatsapp) {
                 return;
             }
-            if (Whatsapp::where('id', $whatsapp->id)->exists()) {
+            if (Whatsapp::where('wamid', $whatsapp->wamid)->exists()) {
                 if ($whatsapp->type === MessageType::STATUS) {
-                    $aux = Whatsapp::find($whatsapp->id);
+                    $aux = Whatsapp::findByWamid($whatsapp->wamid);
                     if (!$aux) {
+                        exit();
                         return;
                     }
                     $status = $aux->message->status ?? null;
                     if ($status == 'read') {
+                        exit();
                         return;
                     }
                     $message = $aux->message;

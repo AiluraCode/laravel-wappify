@@ -4,15 +4,10 @@ namespace AiluraCode\Wappify\Http\Controllers;
 
 use AiluraCode\Wappify\Jobs\WhatsappReceiveMessageJob;
 use AiluraCode\Wappify\Models\Whatsapp;
-use AiluraCode\Wappify\Wappify;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Netflie\WhatsAppCloudApi\WebHook;
-use Netflie\WhatsAppCloudApi\WhatsAppCloudApi;
-use Netflie\WhatsAppCloudApi\Message\OptionsList\Row;
-use Netflie\WhatsAppCloudApi\Message\OptionsList\Section;
-use Netflie\WhatsAppCloudApi\Message\OptionsList\Action;
 
 final class WhatsappController extends Controller
 {
@@ -20,7 +15,6 @@ final class WhatsappController extends Controller
     {
         $webhook = new WebHook();
         echo $webhook->verify($_GET, env('WHATSAPP_API_TOKEN_VERIFICATION'));
-        //return response()->json(['message' => 'Webhook verified']);
     }
 
     public function receive()
@@ -33,7 +27,7 @@ final class WhatsappController extends Controller
 
     public function index()
     {
-        return Whatsapp::paginate(10);
+        return Whatsapp::paginate(25);
     }
 
     public function show(string $id)

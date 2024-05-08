@@ -28,9 +28,7 @@ return [
         'webhook' => [
             'facebook'
         ],
-        'messages' => [
-            'auth'
-        ],
+        'messages' => [],
         'chat' => [],
     ],
 

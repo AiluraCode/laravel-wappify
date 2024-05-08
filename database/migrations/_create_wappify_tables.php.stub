@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('whatsapp', function (Blueprint $table) {
             $table->id();
-            $table->string('wa_id')
+            $table->string('wamid', 100)
                 ->unique();
+            $table->string('profile', 100);
             $table->string('from', 20);
             $table->string('type', 20);
             $table->json('message');

@@ -52,7 +52,7 @@ class Wappify
         $whatsappRequest = $response->request()->body();
         $whatsappBody = $response->decodedBody();
         $data = [
-            "id" => $whatsappBody['messages'][0]['id'],
+            "wamid" => $whatsappBody['messages'][0]['id'],
             "profile" => config('wappify.profile'),
             "from" => $whatsappBody['contacts'][0]['wa_id'],
             "type" => $whatsappRequest['type'],
@@ -70,7 +70,7 @@ class Wappify
     {
         $whatsapp = new Whatsapp();
 
-        $whatsapp->id = $model['id'];
+        $whatsapp->wamid = $model['wamid'];
         $whatsapp->profile = $model['profile'];
         $whatsapp->from = $model['from'];
         $whatsapp->type = $model['type'];
@@ -107,7 +107,7 @@ class Wappify
         }
         if ($message) {
             $data = [
-                "id" => $message['id'],
+                "wamid" => $message['id'],
                 "profile" => $json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name'],
                 "from" => $message['from'],
                 "type" => $message['type'],
@@ -116,7 +116,7 @@ class Wappify
             ];
         } else {
             $data = [
-                'id' => $status['id'],
+                'wamid' => $status['id'],
                 'profile' => $json['entry'][0]['changes'][0]['value']['metadata']['display_phone_number'],
                 'from' => $status['recipient_id'],
                 "type" => 'status',

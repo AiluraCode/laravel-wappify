@@ -4,8 +4,6 @@ namespace AiluraCode\Wappify\Models;
 
 use AiluraCode\Wappify\Enums\MessageType;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -14,20 +12,12 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * Class Whatsapp
  *
  * @property int $id
- * @property string $wa_id
+ * @property string $wamid
+ * @property string $profile
  * @property string $from
  * @property MessageType $type
- * @property mixed $message
+ * @property object $message
  * @property int $timestamp
- * @property string $message["id"]
- * @property string $message["mime_type"]
- * @property string $message["sha256"]
- * @property string $message["filename"]
- * @property string $message["body"]
- * @property string $message["latitude"]
- * @property string $message["longitude"]
- * @property string $message["animated"]
- * @property string $message["voice"]
  * @package AiluraCode\Wappify\Models
  */
 class Whatsapp extends Model implements HasMedia
@@ -36,12 +26,9 @@ class Whatsapp extends Model implements HasMedia
 
     protected $table = 'whatsapp';
     public $timestamps = false;
-    protected $primaryKey = 'id';
-    protected $keyType = 'string';
-    public $incrementing = false;
 
     protected $fillable = [
-        'id',
+        'wamid',
         'profile',
         'from',
         'type',
@@ -52,7 +39,6 @@ class Whatsapp extends Model implements HasMedia
     protected $casts = [
         'message' => 'object',
         'type' => MessageType::class,
-        'timestamp' => 'datetime',
     ];
 
     public function deleteWithMedia()
@@ -61,14 +47,16 @@ class Whatsapp extends Model implements HasMedia
         $this->delete();
     }
 
-    public static function findByFrom(string $from): Builder
+    #region scopes
+
+    public static function scopefindByFrom($query, string $from): Builder
     {
-        return self::whereFrom($from);
+        return $query->whereFrom($from);
     }
 
-    public static function findByWaId(string $waId): Collection
+    public static function findByWamid(string $wamid): Whatsapp
     {
-        return self::whereWaId($waId)->get();
+        return self::whereWamid($wamid)->first();
     }
 
     public function scopeLastMessage($query): Whatsapp
@@ -88,11 +76,224 @@ class Whatsapp extends Model implements HasMedia
 
     public function scopeMe(): Builder
     {
-        return self::where('id', 'LIKE', '%==');
+        return self::where('wamid', 'LIKE', '%==');
     }
 
     public function scopeYou(): Builder
     {
-        return self::where('id', 'NOT LIKE', '%==');
+        return self::where('wamid', 'NOT LIKE', '%==');
+    }
+
+    #endregion
+
+    /**
+     * Get the type of the message
+     * @return MessageType
+     */
+    public function getType(): MessageType
+    {
+        return $this->type;
+    }
+
+
+    #region checks
+
+    /**
+     * Check if the message is a message from server
+     *
+     * @return boolean
+     */
+    public function isMine(): bool
+    {
+        return str_ends_with($this->wamid, "==");
+    }
+
+    /**
+     * Check if the message is a message from client
+     *
+     * @return boolean
+     */
+    public function isYour(): bool
+    {
+        return !$this->isMy();
+    }
+
+    /**
+     * Check if the message is a interactive message
+     *
+     * @return boolean
+     */
+    public function isInteractive(): bool
+    {
+        return $this->type === MessageType::INTERACTIVE;
+    }
+
+    /**
+     * Check if the message is a button reply message
+     *
+     * @return boolean
+     */
+    public function isButtonReply(): bool
+    {
+        return $this->isInteractive() && isset($this->message->button_reply);
+    }
+
+    /**
+     * Check if the message is a text message
+     *
+     * @return boolean
+     */
+    public function isText(): bool
+    {
+        return $this->type === MessageType::TEXT;
+    }
+
+    /**
+     * Check if the message is a image message
+     *
+     * @return boolean
+     */
+    public function isImage(): bool
+    {
+        return $this->type === MessageType::IMAGE;
+    }
+
+    /**
+     * Check if the message is a video message
+     *
+     * @return boolean
+     */
+    public function isVideo(): bool
+    {
+        return $this->type === MessageType::VIDEO;
+    }
+
+    /**
+     * Check if the message is a audio message
+     *
+     * @return boolean
+     */
+    public function isAudio(): bool
+    {
+        return $this->type === MessageType::AUDIO;
+    }
+
+    /**
+     * Check if the message is a document message
+     *
+     * @return boolean
+     */
+    public function isDocument(): bool
+    {
+        return $this->type === MessageType::DOCUMENT;
+    }
+
+    /**
+     * Check if the message is a location message
+     *
+     * @return boolean
+     */
+    public function isLocation(): bool
+    {
+        return $this->type === MessageType::LOCATION;
+    }
+
+    /**
+     * Check if the message is a contact message
+     *
+     * @return boolean
+     */
+    public function isContact(): bool
+    {
+        return $this->type === MessageType::CONTACT;
+    }
+
+    /**
+     * Check if the message is a sticker message
+     *
+     * @return boolean
+     */
+    public function isSticker(): bool
+    {
+        return $this->type === MessageType::STICKER;
+    }
+
+    #endregion
+
+    // TODO
+
+    public function lastInteractive()
+    {
+        return $this->where('type', 'interactive')->orderBy('timestamp', 'desc')->first();
+    }
+
+    public function interactiveType()
+    {
+        return $this->message->type;
+    }
+
+    #region Get Information
+
+    /**
+     * Get the text of the message (only for text type)
+     * @return string
+     */
+    public function getText(): string
+    {
+        return $this->message->body;
+    }
+
+    /**
+     * Get the origin number of the message
+     * @return string
+     */
+    public function getFrom(): string
+    {
+        return $this->from;
+    }
+
+    /**
+     * Get the message object
+     * @return object
+     */
+    public  function getMessage(): object
+    {
+        return $this->message;
+    }
+
+    public function getButtonReply(): object
+    {
+        return $this->message->button_reply;
+    }
+
+    #endregion
+
+    #region Casts
+
+    /**
+     * Cast the message to a text message
+     *
+     * @return string
+     */
+    public function toText(): string
+    {
+        // si no es un mensaje de texto
+        if (!$this->isText()) {
+            throw new \Exception("The message is not a text message");
+        }
+        return $this->message->body;
+    }
+
+    /**
+     * Cast the message to a interactive message
+     *
+     * @return WhatsappInteractiveMessage
+     */
+    public function toInteractive(): WhatsappInteractiveMessage
+    {
+        if (!$this->isInteractive()) {
+            throw new \Exception("The message is not a interactive message");
+        }
+        return new WhatsappInteractiveMessage($this->message);
     }
 }
