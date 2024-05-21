@@ -11,3 +11,6 @@
 
 # private files
 .env
+
+# misc
+/database/migrations/_create_media_table.php
