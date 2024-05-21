@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace AiluraCode\Wappify\Concern;
 
-use AiluraCode\Wappify\Contracts\ShouldMediaMessage;
+use AiluraCode\Wappify\Contracts\Messages\ShouldMultimediaMessage;
+use AiluraCode\Wappify\Contracts\Messages\ShouldTextMessage;
 use AiluraCode\Wappify\Entities\ChangeStatusMessage;
 use AiluraCode\Wappify\Entities\Interactive\InteractiveMessage;
 use AiluraCode\Wappify\Entities\Media\AudioMessage;
@@ -12,15 +13,25 @@ use AiluraCode\Wappify\Entities\Media\DocumentMessage;
 use AiluraCode\Wappify\Entities\Media\ImageMessage;
 use AiluraCode\Wappify\Entities\Media\StickerMessage;
 use AiluraCode\Wappify\Entities\Media\VideoMessage;
-use AiluraCode\Wappify\Entities\ShouldTextMessage;
-use AiluraCode\Wappify\Enums\MessageStatusType;
+use AiluraCode\Wappify\Entities\TextMessage;
 use AiluraCode\Wappify\Enums\MessageType;
 use AiluraCode\Wappify\Exceptions\CastToInteractiveException;
 use AiluraCode\Wappify\Exceptions\CastToMediaException;
 use AiluraCode\Wappify\Exceptions\CastToTextException;
+use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 use Exception;
 
-trait Transformable
+/**
+ * Provides functions to transform a Whatsapp message.
+ *
+ * @since 1.0.0
+ *
+ * @version 1.0.0
+ *
+ * @author SiddharthaGF <livesanty_@hotmail.com>
+ * /
+ */
+trait IsTransformable
 {
     /**
      * Check if the message is an interactive message.
@@ -29,7 +40,7 @@ trait Transformable
      */
     public function isInteractive(): bool
     {
-        return MessageType::INTERACTIVE === $this->type;
+        return MessageType::INTERACTIVE === $this->getType();
     }
 
     /**
@@ -49,7 +60,7 @@ trait Transformable
      */
     public function isText(): bool
     {
-        return MessageType::TEXT === $this->type;
+        return MessageType::TEXT === $this->getType();
     }
 
     /**
@@ -59,7 +70,7 @@ trait Transformable
      */
     public function isImage(): bool
     {
-        return MessageType::IMAGE === $this->type;
+        return MessageType::IMAGE === $this->getType();
     }
 
     /**
@@ -69,7 +80,7 @@ trait Transformable
      */
     public function isVideo(): bool
     {
-        return MessageType::VIDEO === $this->type;
+        return MessageType::VIDEO === $this->getType();
     }
 
     /**
@@ -79,7 +90,7 @@ trait Transformable
      */
     public function isAudio(): bool
     {
-        return MessageType::AUDIO === $this->type;
+        return MessageType::AUDIO === $this->getType();
     }
 
     /**
@@ -89,7 +100,7 @@ trait Transformable
      */
     public function isDocument(): bool
     {
-        return MessageType::DOCUMENT === $this->type;
+        return MessageType::DOCUMENT === $this->getType();
     }
 
     /**
@@ -99,7 +110,7 @@ trait Transformable
      */
     public function isLocation(): bool
     {
-        return MessageType::LOCATION === $this->type;
+        return MessageType::LOCATION === $this->getType();
     }
 
     /**
@@ -109,7 +120,7 @@ trait Transformable
      */
     public function isContact(): bool
     {
-        return MessageType::CONTACT === $this->type;
+        return MessageType::CONTACT === $this->getType();
     }
 
     /**
@@ -119,7 +130,7 @@ trait Transformable
      */
     public function isSticker(): bool
     {
-        return MessageType::STICKER === $this->type;
+        return MessageType::STICKER === $this->getType();
     }
 
     /**
@@ -129,7 +140,7 @@ trait Transformable
      */
     public function isStatus(): bool
     {
-        return MessageType::STATUS === $this->type;
+        return MessageType::STATUS === $this->getType();
     }
 
     /**
@@ -139,7 +150,7 @@ trait Transformable
      */
     public function hasStatus(): bool
     {
-        return isset($this->message->status);
+        return isset($this->getMessage()->status);
     }
 
     /**
@@ -147,7 +158,8 @@ trait Transformable
      *
      * @return ShouldTextMessage
      *
-     * @throws Exception
+     * @throws CastToTextException
+     * @throws PropertyNoExists
      */
     public function toText(): ShouldTextMessage
     {
@@ -155,7 +167,7 @@ trait Transformable
             throw new CastToTextException();
         }
 
-        return new ShouldTextMessage($this->getMessage());
+        return new TextMessage($this->getMessage());
     }
 
     /**
@@ -163,7 +175,7 @@ trait Transformable
      *
      * @return InteractiveMessage
      *
-     * @throws Exception
+     * @throws CastToInteractiveException
      */
     public function toInteractive(): InteractiveMessage
     {
@@ -175,8 +187,12 @@ trait Transformable
     }
 
     /**
+     * Cast the message to a media message.
+     *
+     * @return VideoMessage
+     *
      * @throws CastToMediaException
-     * @throws Exception
+     * @throws PropertyNoExists
      */
     public function toVideo(): VideoMessage
     {
@@ -188,7 +204,11 @@ trait Transformable
     }
 
     /**
-     * @throws CastToMediaException
+     * Cast the message to a status message.
+     *
+     * @return ChangeStatusMessage
+     *
+     * @throws PropertyNoExists
      * @throws Exception
      */
     public function toStatus(): ChangeStatusMessage
@@ -201,25 +221,25 @@ trait Transformable
     }
 
     /**
-     * @throws CastToMediaException
+     * Get the status of the message.
+     *
+     * @return ChangeStatusMessage
+     *
      * @throws Exception
      */
     public function getStatus(): ChangeStatusMessage
     {
-        if (!$this->hasStatus()) {
-            $message = $this->getMessage();
-            $message->status = MessageStatusType::WAITING->value;
-            $this->message = $message;
-        }
-
         return new ChangeStatusMessage($this->getMessage());
     }
 
     /**
+     * Cast the message to a media message.
+     *
+     * @return ShouldMultimediaMessage
      * @throws CastToMediaException
-     * @throws Exception
+     * @throws PropertyNoExists
      */
-    public function toMedia(): ShouldMediaMessage
+    public function toMedia(): ShouldMultimediaMessage
     {
         if (!$this->isMedia()) {
             throw new CastToMediaException();
@@ -236,8 +256,11 @@ trait Transformable
     }
 
     /**
+     * Cast the message to an image message.
+     *
+     * @return ImageMessage
      * @throws CastToMediaException
-     * @throws Exception
+     * @throws PropertyNoExists
      */
     public function toImage(): ImageMessage
     {
@@ -249,8 +272,11 @@ trait Transformable
     }
 
     /**
+     * Cast the message to a document message.
+     *
+     * @return DocumentMessage
      * @throws CastToMediaException
-     * @throws Exception
+     * @throws PropertyNoExists
      */
     public function toDocument(): DocumentMessage
     {
@@ -262,8 +288,11 @@ trait Transformable
     }
 
     /**
+     * Cast the message to a sticker message.
+     *
+     * @return StickerMessage
      * @throws CastToMediaException
-     * @throws Exception
+     * @throws PropertyNoExists
      */
     public function toSticker(): StickerMessage
     {
@@ -275,8 +304,11 @@ trait Transformable
     }
 
     /**
+     * Cast the message to an audio message.
+     *
+     * @return AudioMessage
      * @throws CastToMediaException
-     * @throws Exception
+     * @throws PropertyNoExists
      */
     public function toAudio(): AudioMessage
     {
@@ -288,6 +320,7 @@ trait Transformable
     }
 
     /**
+     * Check if the message is a media message.
      * @return bool
      */
     public function isMedia(): bool

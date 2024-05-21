@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace AiluraCode\Wappify\Entities\Interactive;
 
-use AiluraCode\Wappify\Contracts\ShouldInteractiveMessage;
-use AiluraCode\Wappify\Entities\BaseMessageInterface;
 use AiluraCode\Wappify\Models\Whatsapp;
 
-class ShouldMessage extends BaseMessageInterface implements ShouldInteractiveMessage
+class InteractiveMessage extends BaseInteractiveMessage
 {
     public string $type;
     private object $button_reply;
 
     /**
-     * ShouldMessage constructor.
+     * InteractiveMessage constructor.
+     * @param Whatsapp $whatsapp
      */
     public function __construct(Whatsapp $whatsapp)
     {

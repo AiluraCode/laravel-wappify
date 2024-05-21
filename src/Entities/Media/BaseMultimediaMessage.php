@@ -6,11 +6,12 @@ namespace AiluraCode\Wappify\Entities\Media;
 
 use AiluraCode\Wappify\Concern\IsEditable;
 use AiluraCode\Wappify\Concern\IsMultimediable;
-use AiluraCode\Wappify\Contracts\Messages\ShouldMediaMessage;
+use AiluraCode\Wappify\Contracts\Messages\ShouldMultimediaMessage;
 use AiluraCode\Wappify\Entities\BaseMessage;
+use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 use Exception;
 
-abstract class BaseMediaMessage extends BaseMessage implements ShouldMediaMessage
+abstract class BaseMultimediaMessage extends BaseMessage implements ShouldMultimediaMessage
 {
     use IsMultimediable;
     use IsEditable;
@@ -18,7 +19,7 @@ abstract class BaseMediaMessage extends BaseMessage implements ShouldMediaMessag
     /**
      * @param object $media
      *
-     * @throws Exception
+     * @throws PropertyNoExists
      *
      * @since 1.0.0
      */

@@ -1,7 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AiluraCode\Wappify\Enums;
 
+use Illuminate\Support\Facades\Config;
+
+/**
+ * @method static MessageType TEXT()
+ * @method static MessageType IMAGE()
+ * @method static MessageType AUDIO()
+ * @method static MessageType DOCUMENT()
+ * @method static MessageType VIDEO()
+ * @method static MessageType LOCATION()
+ * @method static MessageType CONTACT()
+ * @method static MessageType STICKER()
+ * @method static MessageType INTERACTIVE()
+ * @method static MessageType CONTACTS()
+ * @method static MessageType STATUS()
+ */
 enum MessageType: string
 {
     case TEXT = 'text';
@@ -18,6 +35,9 @@ enum MessageType: string
 
     public function isDownloadable(): bool
     {
-        return in_array($this, config('wappify.download.allowed'));
+        $haystack = Config::get('wappify.download.allowed');
+
+        // @phpstan-ignore-next-line
+        return in_array($this, $haystack, true);
     }
 }

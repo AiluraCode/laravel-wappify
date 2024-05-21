@@ -18,8 +18,7 @@
         </include>
     </source>
     <php>
-        <env name="WHATSAPP_API_TOKEN"
-            value="EAAFZBOUFN2ZBQBOZBMUI2Ad6cxjMge16jt8eDKc4tdDHyO5h3he9sNAf1xTsDo6GYb96GSaoeg1s7ZCEJfU5ZArCM7HJnBCqDkNTdgVjxZApZCvO3ReYY7kok9JNVWlRZAY5NXBNoZBpGqs5BlEldZBxcLnlBxtngxO3zD0SuJqOpcmGzutaFrKnfDAg2iwglW9nCj" />
-        <env name="WHATSAPP_API_PHONE_NUMBER_ID" value="255764720944895" />
+        <env name="WHATSAPP_API_TOKEN" value="" />
+        <env name="WHATSAPP_API_PHONE_NUMBER_ID" value="" />
     </php>
 </phpunit>

@@ -2,12 +2,12 @@
 
 namespace AiluraCode\Wappify\Entities;
 
-use AiluraCode\Wappify\Contracts\BaseMessageInterface;
-use AiluraCode\Wappify\Traits\IsMessageable;
-use AiluraCode\Wappify\Traits\IsValidable;
+use AiluraCode\Wappify\Concern\IsMessageable;
+use AiluraCode\Wappify\Concern\IsValidable;
+use AiluraCode\Wappify\Contracts\ShouldMessage;
 
 /**
- * Class BaseMessageInterface.
+ * Class ShouldMessage.
  *
  * @since 1.0.0
  *
@@ -15,7 +15,7 @@ use AiluraCode\Wappify\Traits\IsValidable;
  *
  * @author SiddharthaGF <livesanty_@hotmail.com>
  */
-abstract class BaseMediaMessage implements BaseMessageInterface
+abstract class BaseMessage implements ShouldMessage
 {
     use IsMessageable;
     use IsValidable;

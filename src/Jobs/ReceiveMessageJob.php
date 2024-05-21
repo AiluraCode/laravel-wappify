@@ -2,7 +2,6 @@
 
 namespace AiluraCode\Wappify\Jobs;
 
-use AiluraCode\Wappify\Enums\MessageType;
 use AiluraCode\Wappify\Models\Whatsapp;
 use AiluraCode\Wappify\Wappify;
 use Illuminate\Bus\Queueable;
@@ -11,8 +10,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
+use Throwable;
 
-final class WhatsappReceiveMessageJob implements ShouldQueue
+final class ReceiveMessageJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -30,32 +30,35 @@ final class WhatsappReceiveMessageJob implements ShouldQueue
     {
         try {
             $whatsapp = Wappify::catch($this->payload)->get();
-            // @phpstan-ignore-next-line
-            $aux = Whatsapp::findByWamid($whatsapp->getWamId());
-            if ($aux->exists()) {
-                if (MessageType::STATUS === $whatsapp->getType()) {
-                    $status = $aux->message->status ?? null;
-                    if ('read' == $status) {
-                        exit;
+            if ($whatsapp->isStatus()) {
+                // @phpstan-ignore-next-line
+                $whatsapp_old = Whatsapp::findByWamid($whatsapp->getWamId());
+                if ($whatsapp_old->exists()) {
+                    /** @var Whatsapp $whatsapp_old */
+                    if ($whatsapp_old->getStatus()->isRead()) {
+                        return;
                     }
-                    $message = $aux->message;
+                    $message = $whatsapp_old->getMessage();
                     // @phpstan-ignore-next-line
-                    $message->status = $whatsapp->message->status;
-                    $aux->message = $message;
-                    $aux->save();
+                    $message->status = $whatsapp->getMessage()->status;
+                    $whatsapp_old->message = $message;
+                    $whatsapp_old->save();
                 }
-
-                return;
+            } else {
+                $whatsapp->save();
+                whatsapp()->markMessageAsRead($whatsapp->getWamId());
+                $canDownload = Config::get('wappify.download.automatic');
+                if (!$canDownload) {
+                    return;
+                }
+                if ($whatsapp->getType()->isDownloadable()) {
+                    DownloadMediaJob::dispatch($whatsapp)
+                        // @phpstan-ignore-next-line
+                        ->onQueue(Config::get('wappify.queue.name'))
+                    ;
+                }
             }
-
-            $whatsapp->save();
-            if (Config::get('wappify.download.automatic') && $whatsapp->getType()->isDownloadable()) {
-                WhatsappDownloadMediaJob::dispatch($whatsapp)
-                    // @phpstan-ignore-next-line
-                    ->onQueue(Config::get('wappify.queue.name'))
-                ;
-            }
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             dd($th->getMessage());
         }
     }

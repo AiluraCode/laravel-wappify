@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AiluraCode\Wappify\Tests\Feature;
 
 use AiluraCode\Wappify\Entities\BaseMessage;
-use AiluraCode\Wappify\Entities\Media\BaseMediaMessage;
+use AiluraCode\Wappify\Entities\Media\BaseMultimediaMessage;
 use AiluraCode\Wappify\Entities\Media\VideoMessage;
 use AiluraCode\Wappify\Tests\TestCase;
 use AiluraCode\Wappify\Wappify;
@@ -95,7 +95,7 @@ class WappifyTest extends TestCase
         $video = $whatsapp->toMedia();
         $this->assertIsObject($video);
         $this->assertInstanceOf(BaseMessage::class, $video);
-        $this->assertInstanceOf(BaseMediaMessage::class, $video);
+        $this->assertInstanceOf(BaseMultimediaMessage::class, $video);
         $this->assertInstanceOf(VideoMessage::class, $video);
     }
 }

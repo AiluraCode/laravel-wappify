@@ -2,7 +2,21 @@
 
 namespace AiluraCode\Wappify\Contracts\Messages;
 
-interface ShouldAssignMessageContent
+/**
+ * Interface ShouldEditMessage.
+ *
+ * @since 1.0.0
+ *
+ * @version 1.0.0
+ *
+ * @author SiddharthaGF <livesanty_@hotmail.com>
+ */
+interface ShouldEditMessage
 {
-    public function toArray(): void;
+    /**
+     * Convert the content message to an array.
+     *
+     * @return array<string, mixed> The message as an array
+     */
+    public function toArray(): array;
 }

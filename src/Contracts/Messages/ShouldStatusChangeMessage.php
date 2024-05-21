@@ -1,6 +1,8 @@
 <?php
 
-namespace AiluraCode\Wappify\Contracts;
+namespace AiluraCode\Wappify\Contracts\Messages;
+
+use AiluraCode\Wappify\Enums\MessageStatusType;
 
 /**
  * Interface TextMessageMessage.
@@ -11,7 +13,42 @@ namespace AiluraCode\Wappify\Contracts;
  *
  * @author SiddharthaGF <livesanty_@hotmail.com>
  */
-interface ShouldStatusChangeMessage extends ShouldMessage
+interface ShouldStatusChangeMessage extends ShouldEditMessage
 {
-    // TODO: Add the methods that should be implemented by this interface
+
+    /**
+     * Check if the message is read.
+     *
+     * @return bool
+     */
+    public function isRead(): bool;
+
+    /**
+     * Check if the message is sent.
+     *
+     * @return bool
+     */
+    public function isSent(): bool;
+
+    /**
+     * Check if the message is delivered.
+     *
+     * @return bool
+     */
+    public function isDelivered(): bool;
+
+    /**
+     * Check if the message is waiting.
+     *
+     * @return bool
+     */
+    public function isWaiting(): bool;
+
+    /**
+     * Get the status of the message.
+     *
+     * @param MessageStatusType $status
+     * @return void
+     */
+    public function setStatus(MessageStatusType $status): void;
 }

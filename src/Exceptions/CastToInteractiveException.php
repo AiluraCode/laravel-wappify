@@ -2,10 +2,20 @@
 
 namespace AiluraCode\Wappify\Exceptions;
 
-class CastToTextException extends BaseException
+use AiluraCode\Wappify\Enums\Exceptions\ExceptionCodes;
+use AiluraCode\Wappify\Enums\Exceptions\ExceptionMessages;
+use Exception;
+
+class CastToInteractiveException extends Exception
 {
-    public function __construct(string $message = 'The message could not be cast to text.')
-    {
-        parent::__construct($message, ExceptionCode::CAST_TO_TEXT_EXCEPTION);
+    /**
+     * @param ExceptionMessages $message
+     * @param ExceptionCodes    $code
+     */
+    public function __construct(
+        ExceptionMessages $message = ExceptionMessages::CAST_TO_TEXT_EXCEPTION,
+        ExceptionCodes $code = ExceptionCodes::CAST_TO_TEXT_EXCEPTION
+    ) {
+        parent::__construct($message->value, $code->value);
     }
 }

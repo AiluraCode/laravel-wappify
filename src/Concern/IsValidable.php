@@ -5,7 +5,7 @@ namespace AiluraCode\Wappify\Concern;
 use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 
 /**
- * Trait Validable.
+ * Trait IsValidable.
  *
  * @since 1.0.0
  *
@@ -13,7 +13,7 @@ use AiluraCode\Wappify\Exceptions\PropertyNoExists;
  *
  * @author SiddharthaGF <livesanty_@hotmail.com>
  */
-trait Validable
+trait IsValidable
 {
     /**
      * Validate if exists a property in an object.

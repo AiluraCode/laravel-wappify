@@ -19,8 +19,15 @@ class SendButtonReplyMessageJob implements ShouldQueue
 
     /**
      * Create a new job instance.
+     *
+     * @param string              $from
+     * @param string              $message
+     * @param array<ButtonAction> $buttons
      */
-    public function __construct(private string $from, private string $message, private array $buttons)
+    public function __construct(
+        private readonly string $from,
+        private readonly string $message,
+        private readonly array $buttons)
     {
     }
 

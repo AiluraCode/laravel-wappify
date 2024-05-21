@@ -2,10 +2,8 @@
 
 namespace AiluraCode\Wappify\Concern;
 
-use AiluraCode\Wappify\Exceptions\PropertyNoExists;
-
 /**
- * Trait IsValidable.
+ * Provides functions to edit a Whatsapp message.
  *
  * @since 1.0.0
  *
@@ -13,30 +11,21 @@ use AiluraCode\Wappify\Exceptions\PropertyNoExists;
  *
  * @author SiddharthaGF <livesanty_@hotmail.com>
  */
-trait IsValidable
+trait IsEditable
 {
     /**
-     * Validate if exists a property in an object.
+     * Convert the content message to an array.
      *
-     * @param object $object   Object to validate
-     * @param string $property Property to validate
-     *
-     * @return string The property value
-     *
-     * @throws PropertyNoExists If the property does not exist
-     *
-     * @since 1.0.0
-     *
-     * @version 1.0.0
-     *
-     * @author SiddharthaGF <livesanty_@hotmail.com>
+     * @return array<string, mixed> The message as an array
      */
-    public function validateProperty(object $object, string $property): string
+    public function toArray(): array
     {
-        if (!property_exists($object, $property)) {
-            throw new PropertyNoExists($object, $property);
+        $array = [];
+        // @phpstan-ignore-next-line
+        foreach ($this as $key => $value) {
+            $array[$key] = $value;
         }
 
-        return $object->$property;
+        return $array;
     }
 }

@@ -1,3 +1,13 @@
+# IDEs and editors
 /.vscode
+/.idea
 
 /vendor
+
+# Ignore QA tools cache files
+.phpcs-cache
+.phpunit.result.cache
+.php-cs-fixer.cache
+
+# private files
+.env

@@ -1,19 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
 namespace AiluraCode\Wappify\Models;
 
-use AiluraCode\Wappify\Contracts\Whatsapp as IWhatsapp;
+use AiluraCode\Wappify\Concern\IsMessageable;
+use AiluraCode\Wappify\Concern\IsTransformable;
+use AiluraCode\Wappify\Concern\IsValidable;
+use AiluraCode\Wappify\Contracts\ShouldMessage;
 use AiluraCode\Wappify\Enums\MessageType;
-use AiluraCode\Wappify\Traits\IsCastable;
-use AiluraCode\Wappify\Traits\IsMessageable;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
- * Class Base.
+ * Class Whatsapp.
  *
  * @property int         $id
  * @property string      $wamid
@@ -23,17 +23,18 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property object      $message
  * @property int         $timestamp
  */
-abstract class Base extends Model implements IWhatsapp
+class Whatsapp extends Model implements HasMedia, ShouldMessage
 {
     use IsMessageable;
-    use IsCastable;
+    use IsTransformable;
     use InteractsWithMedia;
+    use IsValidable;
 
     public $timestamps = false;
 
     protected $table = 'whatsapp';
 
-    /** @var array<int, string>.> */
+    /** @var array<int, string> */
     protected $fillable = [
         'wamid',
         'profile',
@@ -43,14 +44,16 @@ abstract class Base extends Model implements IWhatsapp
         'timestamp',
     ];
 
-    /** @var array<string, string>.> */
+    /** @var array<string, string> */
     protected $casts = [
         'message' => 'object',
         'type'    => MessageType::class,
     ];
 
     /**
-     * Get the media collection name for the model.
+     * Delete the message with its media.
+     *
+     * @return void
      *
      * @since 1.0.0
      */

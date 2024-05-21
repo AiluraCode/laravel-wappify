@@ -4,20 +4,29 @@ declare(strict_types=1);
 
 namespace AiluraCode\Wappify\Entities\Media;
 
+use AiluraCode\Wappify\Concern\IsEditable;
+use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 use Exception;
 
-class Sticker extends Base
+class StickerMessage extends BaseMultimediaMessage
 {
-    public bool $animated;
+    use IsEditable;
+
+    private bool $animated;
 
     /**
      * @param object $media
      *
-     * @throws Exception
+     * @throws PropertyNoExists
      */
-    public function __construct(private readonly object $media)
+    public function __construct(object $media)
     {
-        parent::__construct($this->media);
-        $this->animated = boolval($this->validateProperty($this->media, 'animated'));
+        parent::__construct($media);
+        $this->animated = boolval($this->validateProperty($media, 'animated'));
+    }
+
+    public function isAnimated(): bool
+    {
+        return $this->animated;
     }
 }

@@ -9,7 +9,7 @@ namespace AiluraCode\Wappify\Contracts\Messages;
  *
  * @version 1.0.0
  */
-interface ShouldMediaMessage extends ShouldEditMessage
+interface ShouldMultimediaMessage extends ShouldEditMessage
 {
     /**
      * Get the unique identifier of the media resource.

@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace AiluraCode\Wappify\Entities\Media;
 
-use Exception;
+use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 
-class AudioMessage extends BaseMessage
+class AudioMessage extends BaseMultimediaMessage
 {
-    public bool $voice;
+    private bool $voice;
 
     /**
      * @param object $media
      *
-     * @throws Exception
+     * @throws PropertyNoExists
      */
-    public function __construct(private readonly object $media)
+    public function __construct(object $media)
     {
-        parent::__construct($this->media);
-        $this->voice = boolval($this->validateProperty($this->media, 'voice'));
+        parent::__construct($media);
+        $this->voice = boolval($this->validateProperty($media, 'voice'));
+    }
+
+    public function isVoice(): bool
+    {
+        return $this->voice;
     }
 }

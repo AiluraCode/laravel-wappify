@@ -1,13 +1,16 @@
 <?php
 
-namespace AiluraCode\Wappify\Enums;
+namespace AiluraCode\Wappify\Enums\Exceptions;
 
 /**
- * @phpstan-type const positive-int
+ * @phpstan-type const string
  */
-enum ExceptionCode: int
+enum ExceptionMessages: string
 {
-    case BASE_EXCEPTION = 500;
-    case CAST_TO_TEXT_EXCEPTION = 501;
-    case CAST_TO_INTERACTIVE_EXCEPTION = 502;
+    case BASE_EXCEPTION = 'An error occurred.';
+    case CAST_TO_TEXT_EXCEPTION = 'The message could not be cast to text.';
+    case CAST_TO_INTERACTIVE_EXCEPTION = 'The message could not be cast to interactive.';
+    case CAST_TO_IMAGE_EXCEPTION = 'The message could not be cast to image.';
+    case CAST_TO_MEDIA_EXCEPTION = 'The message could not be cast to media.';
+    case PROPERTY_NO_EXISTS_EXCEPTION = 'The property "%property%" does not exist in the object "%object%".';
 }

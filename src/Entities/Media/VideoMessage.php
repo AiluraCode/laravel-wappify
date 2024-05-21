@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace AiluraCode\Wappify\Entities\Media;
 
-use Exception;
+use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 
-class Video extends Base
+class VideoMessage extends BaseMultimediaMessage
 {
     /**
      * @param object $media
      *
-     * @throws Exception
+     * @throws PropertyNoExists
+     * @since 1.0.0
      */
-    public function __construct(private readonly object $media)
+    public function __construct(object $media)
     {
-        parent::__construct($this->media);
+        parent::__construct($media);
     }
 }

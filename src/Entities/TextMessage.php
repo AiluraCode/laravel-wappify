@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace AiluraCode\Wappify\Entities;
 
+use AiluraCode\Wappify\Concern\IsEditable;
 use AiluraCode\Wappify\Concern\IsTexteable;
-use AiluraCode\Wappify\Contracts\ShouldTextMessage;
+use AiluraCode\Wappify\Contracts\Messages\ShouldTextMessage;
+use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 use Exception;
 
-class ShouldTextMessage extends BaseMessage implements ShouldTextMessage
+class TextMessage extends BaseMessage implements ShouldTextMessage
 {
     use IsTexteable;
+    use IsEditable;
 
     public string $body;
 
     /**
      * @param object $message
      *
-     * @throws Exception
+     * @throws PropertyNoExists
      */
     public function __construct(object $message)
     {

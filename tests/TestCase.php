@@ -2,7 +2,7 @@
 
 namespace AiluraCode\Wappify\Tests;
 
-use AiluraCode\Wappify\WappifyServiceProvider;
+use AiluraCode\Wappify\Providers\WappifyServiceProvider;
 
 /**
  * @internal

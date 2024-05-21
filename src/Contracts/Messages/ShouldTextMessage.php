@@ -1,9 +1,9 @@
 <?php
 
-namespace AiluraCode\Wappify\Contracts;
+namespace AiluraCode\Wappify\Contracts\Messages;
 
 /**
- * Interface TextMessageMessage.
+ * Interface ShouldTextMessage.
  *
  * @since 1.0.0
  *
@@ -11,7 +11,7 @@ namespace AiluraCode\Wappify\Contracts;
  *
  * @author SiddharthaGF <livesanty_@hotmail.com>
  */
-interface ShouldTextMessage extends ShouldMessage
+interface ShouldTextMessage extends ShouldEditMessage
 {
     /**
      * Get the body of the text message.
@@ -19,4 +19,12 @@ interface ShouldTextMessage extends ShouldMessage
      * @return string The body of the text message
      */
     public function getBody(): string;
+
+    /**
+     * Set the body of the text message.
+     *
+     * @param string $body The body of the text message
+     * @return void
+     */
+    public function setBody(string $body): void;
 }
