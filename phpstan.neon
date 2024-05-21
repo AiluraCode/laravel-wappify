@@ -1,0 +1,12 @@
+# Don't touch this file if you don't know what you are doing.
+
+parameters:
+  level: 9
+  paths:
+    - src
+    - tests
+    - config
+    - database
+    - routes
+  excludePaths:
+    - ./vendor/*/data/*
