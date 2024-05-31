@@ -36,6 +36,7 @@ class SendDocumentMessageJob implements ShouldQueue
     public function handle(): void
     {
         $document_link = $this->document->getUrl();
+        $document_link = str_replace("http://cactu-pachanoi.test", "https://united-hip-macaw.ngrok-free.app/cactu-pachanoi/public",$document_link);
         $document_name = $this->document->name;
         $document_caption = 'Document: ' . $document_name;
         $link_id = new LinkID($document_link);

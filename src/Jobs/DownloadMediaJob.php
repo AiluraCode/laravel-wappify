@@ -7,6 +7,7 @@ namespace AiluraCode\Wappify\Jobs;
 use AiluraCode\Wappify\Contracts\Messages\ShouldMultimediaMessage;
 use AiluraCode\Wappify\Contracts\ShouldMessage;
 use AiluraCode\Wappify\Exceptions\CastToMediaException;
+use AiluraCode\Wappify\Exceptions\PropertyNoExists;
 use AiluraCode\Wappify\Models\Whatsapp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,11 +34,11 @@ final class DownloadMediaJob implements ShouldQueue
      * @param string      $collection The collection name
      * @param string|null $name       The name of the media
      *
-     * @throws CastToMediaException
+     * @throws CastToMediaException|PropertyNoExists
      */
     public function __construct(
         private readonly ShouldMessage $whatsapp,
-        private string $collection,
+        private string $collection = 'default',
         private ?string $name = null,
     ) {
         // @phpstan-ignore-next-line

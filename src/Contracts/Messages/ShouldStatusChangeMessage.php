@@ -43,12 +43,4 @@ interface ShouldStatusChangeMessage extends ShouldEditMessage
      * @return bool
      */
     public function isWaiting(): bool;
-
-    /**
-     * Get the status of the message.
-     *
-     * @param MessageStatusType $status
-     * @return void
-     */
-    public function setStatus(MessageStatusType $status): void;
 }

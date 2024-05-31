@@ -1,6 +1,8 @@
 <?php
 
-namespace AiluraCode\Wappify\Contracts;
+namespace AiluraCode\Wappify\Contracts\Messages;
+
+use AiluraCode\Wappify\Contracts\ShouldMessage;
 
 /**
  * Interface InteractiveMessage.
