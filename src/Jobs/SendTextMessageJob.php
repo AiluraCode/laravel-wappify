@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Netflie\WhatsAppCloudApi\Response\ResponseException;
 
 class SendTextMessageJob implements ShouldQueue
 {
@@ -25,6 +26,7 @@ class SendTextMessageJob implements ShouldQueue
 
     /**
      * Execute the job.
+     * @throws ResponseException
      */
     public function handle(): void
     {
