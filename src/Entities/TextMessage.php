@@ -8,7 +8,6 @@ use AiluraCode\Wappify\Concern\IsEditable;
 use AiluraCode\Wappify\Concern\IsTexteable;
 use AiluraCode\Wappify\Contracts\Messages\ShouldTextMessage;
 use AiluraCode\Wappify\Exceptions\PropertyNoExists;
-use Exception;
 
 class TextMessage extends BaseMessage implements ShouldTextMessage
 {

@@ -32,6 +32,7 @@ enum MessageType: string
     case INTERACTIVE = 'interactive';
     case CONTACTS = 'contacts';
     case STATUS = 'status';
+    case TEMPLATE = 'template';
 
     public function isDownloadable(): bool
     {

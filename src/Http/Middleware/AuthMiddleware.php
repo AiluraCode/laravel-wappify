@@ -18,7 +18,7 @@ class AuthMiddleware
     {
         $isAuthenticatedAdmin = Auth::check();
         if (!$isAuthenticatedAdmin) {
-            return response()->json(['message' => config('wappify.middleware.auth.unauthorized-request')], 401);
+            return response()->json(['message' => 'Request rejected because the user is not authorized'], 401);
         }
 
         return $next($request);

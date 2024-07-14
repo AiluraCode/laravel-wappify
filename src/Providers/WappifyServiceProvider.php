@@ -27,13 +27,13 @@ class WappifyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Route::middleware('api')
-            ->prefix('api')
+            ->prefix(config('wappify.api.prefix', 'api'))
             ->group(function (): void {
                 $this->loadRoutesFrom(__DIR__ . '/../../routes/api.php');
             });
         $this->publishes([
             __DIR__ . '/../../config/wappify.php' => config_path('wappify.php'),
-        ], 'wappify-config');
+        ], 'config');
 
         $stub = __DIR__ . '/../../database/migrations/_create_wappify_table.php';
         $file = database_path('migrations/' . date('Y_m_d_His', time()) . '_create_wappify_table.php');
@@ -47,12 +47,10 @@ class WappifyServiceProvider extends ServiceProvider
         }
         // @phpstan-ignore-next-line
         $this->app['router']
-            ->aliasMiddleware(config('wappify.middleware.facebook.name'), FacebookMiddleware::class)
-        ;
+            ->aliasMiddleware(config('wappify.middleware.facebook.name'), FacebookMiddleware::class);
         // @phpstan-ignore-next-line
         $this->app['router']
-            ->aliasMiddleware(config('wappify.middleware.auth.name'), AuthMiddleware::class)
-        ;
+            ->aliasMiddleware(config('wappify.middleware.auth.name'), AuthMiddleware::class);
         require_once __DIR__ . '/../helpers.php';
     }
 }

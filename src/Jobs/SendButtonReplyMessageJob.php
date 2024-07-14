@@ -27,7 +27,8 @@ class SendButtonReplyMessageJob implements ShouldQueue
     public function __construct(
         private readonly string $from,
         private readonly string $message,
-        private readonly array $buttons
+        private readonly array $buttons,
+        private $account = 'default'
     ) {
     }
 
@@ -38,7 +39,7 @@ class SendButtonReplyMessageJob implements ShouldQueue
     {
         try {
             $action = new ButtonAction($this->buttons);
-            $response = whatsapp()->sendButton(
+            $response = whatsapp($this->account)->sendButton(
                 $this->from,
                 $this->message,
                 $action

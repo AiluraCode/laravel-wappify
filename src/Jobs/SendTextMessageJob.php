@@ -20,17 +20,18 @@ class SendTextMessageJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private string $from, private string $text)
+    public function __construct(private string $from, private string $text, private $account = 'default')
     {
     }
 
     /**
      * Execute the job.
+     *
      * @throws ResponseException
      */
     public function handle(): void
     {
-        $response = whatsapp()->sendTextMessage(
+        $response = whatsapp($this->account)->sendTextMessage(
             $this->from,
             $this->text
         );

@@ -23,7 +23,7 @@ class SendDocumentMessageJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private string $from, private Media $document)
+    public function __construct(private string $from, private Media $document, private $account = 'default')
     {
     }
 
@@ -36,11 +36,11 @@ class SendDocumentMessageJob implements ShouldQueue
     public function handle(): void
     {
         $document_link = $this->document->getUrl();
-        $document_link = str_replace("http://cactu-pachanoi.test", "https://united-hip-macaw.ngrok-free.app/cactu-pachanoi/public",$document_link);
+        $document_link = str_replace('http://cactu-pachanoi.test', 'https://united-hip-macaw.ngrok-free.app/cactu-pachanoi/public', $document_link);
         $document_name = $this->document->name;
-        $document_caption = 'Document: ' . $document_name;
+        $document_caption = "Document: $document_name";
         $link_id = new LinkID($document_link);
-        $response = whatsapp()->sendDocument(
+        $response = whatsapp($this->account)->sendDocument(
             $this->from,
             $link_id,
             $document_name,

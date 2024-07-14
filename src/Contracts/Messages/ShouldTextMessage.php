@@ -24,6 +24,7 @@ interface ShouldTextMessage extends ShouldEditMessage
      * Set the body of the text message.
      *
      * @param string $body The body of the text message
+     *
      * @return void
      */
     public function setBody(string $body): void;

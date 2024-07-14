@@ -20,10 +20,12 @@ final class ReceiveMessageJob implements ShouldQueue
     use SerializesModels;
 
     private string $payload;
+    private string $account;
 
-    public function __construct(string $payload)
+    public function __construct(string $payload, string $account = 'default')
     {
         $this->payload = $payload;
+        $this->account = $account;
     }
 
     public function handle(): void
@@ -46,16 +48,17 @@ final class ReceiveMessageJob implements ShouldQueue
                 }
             } else {
                 $whatsapp->save();
-                whatsapp()->markMessageAsRead($whatsapp->getWamId());
+                whatsapp($this->account)->markMessageAsRead($whatsapp->getWamId());
                 $canDownload = Config::get('wappify.download.automatic');
                 if (!$canDownload) {
                     return;
                 }
                 if ($whatsapp->getType()->isDownloadable()) {
+                    $queue = Config::get('wappify.accounts.' . $this->account . '.queue');
                     DownloadMediaJob::dispatch($whatsapp)
                         // @phpstan-ignore-next-line
-                        ->onQueue(Config::get('wappify.queue.name'))
-                    ;
+                        ->onQueue($queue['name'])
+                        ->onConnection($queue['connection']);
                 }
             }
         } catch (Throwable $th) {

@@ -1,33 +1,53 @@
 <?php
 
-use AiluraCode\Wappify\Enums\MessageType as Whatsapp;
-
 return [
     'client' => [
         'url'     => 'https://graph.facebook.com',
         'version' => 'v19.0',
-        'token'   => env('WHATSAPP_API_TOKEN'),
+    ],
+
+    'accounts' => [
+        'default' => [
+            'profile'   => 'default',
+            'number_id' => env('WHATSAPP_API_PHONE_NUMBER_ID'),
+            'token'     => env('WHATSAPP_API_TOKEN'),
+            'queue'     => [
+                'connection' => 'redis',
+                'name'       => 'wappify',
+                'tries'      => 3,
+                'timeout'    => 5,
+            ],
+            'download' => [
+                'automatic' => true,
+                'strategy'  => 'spatie',
+                'allowed'   => [
+                    AiluraCode\Wappify\Enums\MessageType::IMAGE,
+                    AiluraCode\Wappify\Enums\MessageType::AUDIO,
+                    AiluraCode\Wappify\Enums\MessageType::DOCUMENT,
+                    AiluraCode\Wappify\Enums\MessageType::VIDEO,
+                    AiluraCode\Wappify\Enums\MessageType::STICKER,
+                ],
+            ],
+        ],
     ],
 
     'api' => [
-        'name'   => 'whatsapp',
-        'prefix' => 'whatsapp',
-    ],
-
-    'queue' => [
-        'name'    => 'whatsapp',
-        'tries'   => 1,
-        'timeout' => 60,
-    ],
-
-    'profile' => 'wappify',
-
-    'middlewares' => [
-        'webhook' => [
+        'prefix'   => 'api',
+        'path'     => 'whatsapp',
+        'name'     => 'wappify',
+        'webhooks' => [
+            AiluraCode\Wappify\Http\Controllers\WebhookController::class,
+        ],
+        'middleware_webhooks' => [
             'facebook',
         ],
-        'messages' => [],
-        'chat'     => [],
+        'resources' => [
+            AiluraCode\Wappify\Http\Controllers\MessagesController::class,
+            AiluraCode\Wappify\Http\Controllers\ChatController::class,
+        ],
+        'middleware_resources' => [
+            // 'auth',
+        ],
     ],
 
     'middleware' => [
@@ -36,7 +56,6 @@ return [
             'headers' => [
                 'User-Agent' => ['facebookplatform/1.0 (+http://developers.facebook.com)', 'facebookexternalua'],
             ],
-            'unauthorized-request' => 'Request rejected because the client does not belong to Facebook',
         ],
         'auth' => [
             'name'                 => 'auth',
@@ -44,19 +63,7 @@ return [
         ],
     ],
 
-    'download' => [
-        'automatic' => true,
-        'strategy'  => 'spatie',
-        'allowed'   => [
-            Whatsapp::IMAGE,
-            Whatsapp::AUDIO,
-            Whatsapp::DOCUMENT,
-            Whatsapp::VIDEO,
-            Whatsapp::STICKER,
-        ],
-    ],
-
-    'default' => [
+    'local' => [
         'disk' => 'public',
         'path' => 'public/wappify',
     ],

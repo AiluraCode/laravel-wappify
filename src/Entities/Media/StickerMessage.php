@@ -6,7 +6,6 @@ namespace AiluraCode\Wappify\Entities\Media;
 
 use AiluraCode\Wappify\Concern\IsEditable;
 use AiluraCode\Wappify\Exceptions\PropertyNoExists;
-use Exception;
 
 class StickerMessage extends BaseMultimediaMessage
 {

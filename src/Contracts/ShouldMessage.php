@@ -106,7 +106,6 @@ interface ShouldMessage
      */
     public function getTimestamp(): int;
 
-
     /**
      * Set the timestamp of the time the message was received.
      *

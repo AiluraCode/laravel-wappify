@@ -17,7 +17,7 @@ class FacebookMiddleware
     {
         $headers = config('wappify.middleware.facebook.headers');
         if (!in_array($request->header('User-Agent'), $headers['User-Agent'], true)) {
-            return response()->json(['message' => config('wappify.middleware.facebook.unauthorized-request')], 401);
+            return response()->json(['message' => 'Request rejected because the client does not belong to Facebook'], 401);
         }
 
         return $next($request);

@@ -186,4 +186,12 @@ class Whatsapp extends Model implements HasMedia, ShouldMessage
             ->orderBy('timestamp', 'desc')
             ->first();
     }
+
+    public function transferMedia(Model $model, string $collection = 'default', $deleteOriginal = false): void
+    {
+        $this->getMedia()->each(fn ($media) => $media->copy($model, $collection));
+        if ($deleteOriginal) {
+            $this->getMedia()->each(fn ($media) => $media->delete());
+        }
+    }
 }

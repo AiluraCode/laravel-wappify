@@ -8,7 +8,6 @@ use AiluraCode\Wappify\Concern\IsEditable;
 use AiluraCode\Wappify\Contracts\Messages\ShouldStatusChangeMessage;
 use AiluraCode\Wappify\Enums\MessageStatusType;
 use AiluraCode\Wappify\Exceptions\PropertyNoExists;
-use Exception;
 
 class ChangeStatusMessage extends BaseMessage implements ShouldStatusChangeMessage
 {

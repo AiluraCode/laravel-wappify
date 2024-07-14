@@ -236,6 +236,7 @@ trait IsTransformable
      * Cast the message to a media message.
      *
      * @return ShouldMultimediaMessage
+     *
      * @throws CastToMediaException
      * @throws PropertyNoExists
      */
@@ -259,6 +260,7 @@ trait IsTransformable
      * Cast the message to an image message.
      *
      * @return ImageMessage
+     *
      * @throws CastToMediaException
      * @throws PropertyNoExists
      */
@@ -275,6 +277,7 @@ trait IsTransformable
      * Cast the message to a document message.
      *
      * @return DocumentMessage
+     *
      * @throws CastToMediaException
      * @throws PropertyNoExists
      */
@@ -291,6 +294,7 @@ trait IsTransformable
      * Cast the message to a sticker message.
      *
      * @return StickerMessage
+     *
      * @throws CastToMediaException
      * @throws PropertyNoExists
      */
@@ -307,6 +311,7 @@ trait IsTransformable
      * Cast the message to an audio message.
      *
      * @return AudioMessage
+     *
      * @throws CastToMediaException
      * @throws PropertyNoExists
      */
@@ -321,6 +326,7 @@ trait IsTransformable
 
     /**
      * Check if the message is a media message.
+     *
      * @return bool
      */
     public function isMedia(): bool

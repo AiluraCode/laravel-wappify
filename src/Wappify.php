@@ -54,7 +54,7 @@ class Wappify
      *
      * @return array<object> the data to create the model
      */
-    public static function responseToModel(Response $response): array
+    public static function responseToModel(Response $response, $account = 'default'): array
     {
         // @phpstan-ignore-next-line
         $whatsappRequest = $response->request()->body();
@@ -64,7 +64,7 @@ class Wappify
 
         return [
             'wamid'     => $whatsappBody['messages'][0]['id'],
-            'profile'   => Config::get('wappify.profile'),
+            'profile'   => Config::get("wappify.accounts.$account.profile"),
             'from'      => $whatsappBody['contacts'][0]['wa_id'],
             'type'      => $whatsappRequest['type'],
             'message'   => $message,

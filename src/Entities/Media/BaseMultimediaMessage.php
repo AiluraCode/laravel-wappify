@@ -9,7 +9,6 @@ use AiluraCode\Wappify\Concern\IsMultimediable;
 use AiluraCode\Wappify\Contracts\Messages\ShouldMultimediaMessage;
 use AiluraCode\Wappify\Entities\BaseMessage;
 use AiluraCode\Wappify\Exceptions\PropertyNoExists;
-use Exception;
 
 abstract class BaseMultimediaMessage extends BaseMessage implements ShouldMultimediaMessage
 {

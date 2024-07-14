@@ -13,6 +13,7 @@ class InteractiveMessage extends BaseInteractiveMessage
 
     /**
      * InteractiveMessage constructor.
+     *
      * @param Whatsapp $whatsapp
      */
     public function __construct(Whatsapp $whatsapp)

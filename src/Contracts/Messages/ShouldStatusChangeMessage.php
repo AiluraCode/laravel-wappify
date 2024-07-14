@@ -2,8 +2,6 @@
 
 namespace AiluraCode\Wappify\Contracts\Messages;
 
-use AiluraCode\Wappify\Enums\MessageStatusType;
-
 /**
  * Interface TextMessageMessage.
  *
@@ -15,7 +13,6 @@ use AiluraCode\Wappify\Enums\MessageStatusType;
  */
 interface ShouldStatusChangeMessage extends ShouldEditMessage
 {
-
     /**
      * Check if the message is read.
      *
